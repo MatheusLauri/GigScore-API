@@ -23,19 +23,19 @@ public class IfoodRoute extends RouteBuilder {
         from("direct:buscarDadosIfood")
             .routeId("rota-ifood-summary")
             .log("Buscando dados do iFood para o usuário: ${header.userId}")
-            .toD("http://localhost:8081/ifood/summary/${header.userId}")
+            .toD("http://localhost:8086/ifood/summary/${header.userId}")
             .log("✅ Retorno da API do iFood: ${body}");
 
         from("direct:buscarPerformanceIfood")
             .routeId("rota-ifood-perfomance")
             .log("Buscando dados de performance do iFood para o usuário: ${header.userId}")
-            .toD("http://localhost:8081/ifood/performance/${header.userId}")
+            .toD("http://localhost:8086/ifood/performance/${header.userId}")
             .log("✅ Retorno da API do iFood: ${body}");
 
         from("direct:BuscarGanhosIfood")
             .routeId("rota-ifood-ganhos")
             .log("Buscando dados de ganhos do iFood para o usuário: ${header.userId}")
-            .toD("http://localhost:8081/ifood/earnings/${header.userId}")
+            .toD("http://localhost:8086/ifood/earnings/${header.userId}")
             .log("✅ Retorno da API do iFood: ${body}");
     }
 }
