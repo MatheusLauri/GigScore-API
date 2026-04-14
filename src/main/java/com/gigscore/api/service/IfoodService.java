@@ -12,6 +12,18 @@ public class IfoodService {
         this.producerTemplate = producerTemplate;
     }
 
+    public String buscarTodosOsDados(String userId) {
+        // Dispara a rota orquestradora do iFood que faz o multicast e agregação
+        return producerTemplate.requestBodyAndHeader(
+                "direct:buscarTodosDadosIfood",
+                null,
+                "userId",
+                userId,
+                String.class
+        );
+    }
+
+    // Mantive as rotas individuais caso precise delas para os testes ou controllers antigos
     public String buscarDados(String userId) {
         return producerTemplate.requestBodyAndHeader(
                 "direct:buscarDadosIfood",
