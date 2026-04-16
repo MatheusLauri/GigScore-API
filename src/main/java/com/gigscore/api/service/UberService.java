@@ -11,6 +11,16 @@ public class UberService {
         this.producerTemplate = producerTemplate;
     }
 
+    public String buscarTodosOsDados(String userId) {
+        return producerTemplate.requestBodyAndHeader(
+                "direct:buscarTodosDadosUber",
+                null,
+                "userId",
+                userId,
+                String.class
+        );
+    }
+
     public String buscarDados(String userId) {
         return producerTemplate.requestBodyAndHeader(
                 "direct:BuscarDadosUber",

@@ -1,9 +1,9 @@
-package com.gigscore.api.integration.ifood;
+package com.gigscore.api.integration.uber;
 
 import org.apache.camel.AggregationStrategy;
 import org.apache.camel.Exchange;
 
-public class IfoodAggregationStrategy implements AggregationStrategy {
+public class UberAggregationStrategy implements AggregationStrategy {
 
     @Override
     public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
@@ -14,10 +14,8 @@ public class IfoodAggregationStrategy implements AggregationStrategy {
         String dadosAgregados = oldExchange.getIn().getBody(String.class);
         String novoDado = newExchange.getIn().getBody(String.class);
 
-        // Verifica se algum dos dados é um array JSON ou null/vazio.
-        // Essa proteção é necessária para não quebrar a concatenação
         if (novoDado == null || novoDado.isBlank() || novoDado.startsWith("[")) {
-            return oldExchange; // Ignora concatenação simples para arrays
+            return oldExchange;
         }
         
         if (dadosAgregados == null || dadosAgregados.isBlank() || dadosAgregados.startsWith("[")) {

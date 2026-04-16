@@ -11,9 +11,6 @@ public class IfoodRoute extends RouteBuilder {
     @Override
     public void configure() {
 
-        // =========================================================
-        // RESILIÊNCIA (RETRY GLOBAL)
-        // =========================================================
         onException(ConnectException.class, org.apache.camel.http.base.HttpOperationFailedException.class)
             .handled(true)
             .maximumRedeliveries(3) 
@@ -22,30 +19,20 @@ public class IfoodRoute extends RouteBuilder {
             .logRetryAttempted(true)
             .log("⚠️ Falha ao acessar API do iFood. Tentativa ${header.CamelRedeliveryCounter} de 3 para o usuário: ${header.userId}");
 
-        // =========================================================
-        // ORQUESTRADOR DE AGREGAÇÃO (I-FOOD COMPLETO)
-        // =========================================================
+
         from("direct:buscarTodosDadosIfood")
             .routeId("rota-ifood-orquestrador")
             .log("🚀 Iniciando coleta agregada e paralela do iFood para o CPF: ${header.userId}")
-            
-            // O multicast chama todas as três rotas ao mesmo tempo e junta os três JSONs usando nossa estratégia
             .multicast(new IfoodAggregationStrategy())
                 .parallelProcessing()
-                .timeout(5000) // Se uma das três demorar mais de 5s, ela é abortada para não travar o processo
+                .timeout(5000)
                 .to(
                     "direct:buscarDadosIfood",
                     "direct:buscarPerformanceIfood",
                     "direct:BuscarGanhosIfood"
                 )
-            .end() // Fecha o bloco multicast
-            
+            .end()
             .log("📦 Dados do iFood 100% agregados: ${body}");
-
-
-        // =========================================================
-        // CHAMADAS INDIVIDUAIS (MOCKS)
-        // =========================================================
 
         from("direct:buscarDadosIfood")
             .routeId("rota-ifood-summary")

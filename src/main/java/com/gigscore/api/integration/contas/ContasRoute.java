@@ -19,23 +19,37 @@ public class ContasRoute extends RouteBuilder {
             .logRetryAttempted(true)
             .log("⚠️ Falha ao acessar API de Contas Bancárias. Tentativa ${header.CamelRedeliveryCounter} de 3 para o usuário: ${header.userId}");
 
+        // =========================================================
+        // ORQUESTRADOR DE AGREGAÇÃO (CONTAS COMPLETO)
+        // =========================================================
+        from("direct:buscarTodosDadosContas")
+            .routeId("rota-contas-orquestrador")
+            .log("🚀 Iniciando coleta agregada e paralela de Contas para o CPF: ${header.userId}")
+            .multicast(new ContasAggregationStrategy())
+                .parallelProcessing()
+                .timeout(5000)
+                .to(
+                    "direct:BuscarHistoricoContas",
+                    "direct:BuscarScoreDePagamento",
+                    "direct:BuscarContasPendentes"
+                )
+            .end()
+            .log("📦 Dados de Contas 100% agregados: ${body}");
+
 
         from("direct:BuscarHistoricoContas")
             .routeId("rota-contas-summary")
             .log("Buscando dados de histórico de Contas do usuário: ${header.userId}")
-            .toD("http://localhost:8083/bills/history/${header.userId}")
-            .log("✅ Retorno da API de Contas (Summary): ${body}");
+            .toD("http://localhost:8081/contas/summary/${header.userId}");
 
         from("direct:BuscarScoreDePagamento")
             .routeId("rota-contas-score")
             .log("Buscando dados de score de pagamento para o usuário: ${header.userId}")
-            .toD("http://localhost:8083/bills/score/${header.userId}")
-            .log("✅ Retorno da API de Contas (Score): ${body}");
+            .toD("http://localhost:8081/bills/score/${header.userId}");
 
         from("direct:BuscarContasPendentes")
             .routeId("rota-contas-pendentes")
             .log("Buscando dados de contas atrasadas para o usuário: ${header.userId}")
-            .toD("http://localhost:8083/bills/open/${header.userId}")
-            .log("✅ Retorno da API de Contas (Atrasadas): ${body}");
+            .toD("http://localhost:8081/bills/open/${header.userId}");
     }
 }

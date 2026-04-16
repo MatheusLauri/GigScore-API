@@ -11,6 +11,16 @@ public class ContasService {
         this.producerTemplate = producerTemplate;
     }
 
+    public String buscarTodosOsDados(String userId) {
+        return producerTemplate.requestBodyAndHeader(
+                "direct:buscarTodosDadosContas",
+                null,
+                "userId",
+                userId,
+                String.class
+        );
+    }
+
     public String buscarResumoContas(String userId) {
         return producerTemplate.requestBodyAndHeader(
                 "direct:BuscarHistoricoContas",
