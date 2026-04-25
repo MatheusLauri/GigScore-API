@@ -10,7 +10,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.kafka.core.KafkaTemplate;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,6 +30,9 @@ class ColetaDadosConsumerTest {
     @Mock
     private ContasService contasService;
 
+    @Mock
+    private KafkaTemplate<String, Object> kafkaTemplate;
+
     @Spy
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -35,7 +41,7 @@ class ColetaDadosConsumerTest {
 
     @Test
     void escutarSolicitacao_DeveAcionarServicosParaColetarDados() {
-        String mensagemJson = "{\"cpf\": \"12345678900\"}";
+        String mensagemJson = "{\"analysisId\": \"123\", \"cpf\": \"12345678900\"}";
         String cpfExtraido = "12345678900";
 
         when(ifoodService.buscarTodosOsDados(cpfExtraido)).thenReturn("{\"status\": \"sucesso\"}");
@@ -47,5 +53,6 @@ class ColetaDadosConsumerTest {
         verify(ifoodService, times(1)).buscarTodosOsDados(cpfExtraido);
         verify(uberService, times(1)).buscarTodosOsDados(cpfExtraido);
         verify(contasService, times(1)).buscarTodosOsDados(cpfExtraido);
+        verify(kafkaTemplate, times(1)).send(eq("financial-data-collected"), eq("123"), anyString());
     }
 }

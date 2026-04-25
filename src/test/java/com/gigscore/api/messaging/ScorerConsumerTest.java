@@ -29,17 +29,18 @@ class ScorerConsumerTest {
 
     @Test
     void calcularScore_DeveCalcularEAtualizarBanco() {
-        String pacoteFinanceiro = """
+        String dadosNormalizados = """
         {
           "analysisId": "test-id-123",
           "cpf": "12345678900",
-          "ifood": { "ganhos_totais": 3000.00 },
-          "uber": { "ganhos_totais": 2500.00 },
-          "contas": { "score_pagamento": 800 }
+          "totalMonthlyIncome": 5500.00,
+          "platformReputationScore": 4.8,
+          "totalCompletedGigs": 250,
+          "paymentHistoryScore": 800
         }
         """;
 
-        scorerConsumer.calcularScore(pacoteFinanceiro);
+        scorerConsumer.calcularScore(dadosNormalizados);
 
         // Captura o objeto que foi enviado para o método save() do nosso banco de dados mock
         ArgumentCaptor<CreditAnalysisResponse> captor = ArgumentCaptor.forClass(CreditAnalysisResponse.class);

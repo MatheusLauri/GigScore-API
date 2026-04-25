@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <!-- Appender para exibir os logs em JSON no Console (melhor para Datadog/ELK) -->
+    <appender name="jsonConsole" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <includeContext>false</includeContext>
+            <customFields>{"app":"gigscore-api"}</customFields>
+        </encoder>
+    </appender>
+
+    <!-- Console Padrão para desenvolvimento local -->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Escolhe o tipo de log baseado em Profile (JSON no cloud, console em local) -->
+    <springProfile name="cloud">
+        <root level="INFO">
+            <appender-ref ref="jsonConsole"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="!cloud">
+        <root level="INFO">
+            <appender-ref ref="console"/>
+        </root>
+    </springProfile>
+
+</configuration>

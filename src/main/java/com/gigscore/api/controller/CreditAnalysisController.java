@@ -41,7 +41,7 @@ public class CreditAnalysisController {
                 .body(new CreditAnalysisStatusResponse(analysisId, "PROCESSING"));
     }
 
-    @GetMapping("/{analysisId}")
+    @GetMapping(path = "/{analysisId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CreditAnalysisResponse> consultarStatus(@PathVariable String analysisId) {
         CreditAnalysisResponse analise = databaseService.findById(analysisId);
 
@@ -72,7 +72,7 @@ public class CreditAnalysisController {
                 .body(new CreditAnalysisStatusResponse(analysisId, "PROCESSING"));
     }
 
-    @GetMapping("/{analysisId}/details")
+    @GetMapping(path = "/{analysisId}/details", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> consultarDetalhes(@PathVariable String analysisId) {
         if (databaseService.findById(analysisId) == null) {
             return ResponseEntity.notFound().build();
